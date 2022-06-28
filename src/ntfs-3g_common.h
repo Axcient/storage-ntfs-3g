@@ -97,6 +97,7 @@ enum {
 	OPT_HELP,
 	OPT_VERSION,
 	OPT_DIRECT_IO,
+	OPT_DEV_OFFSET,
 } ;
 
 			/* Option flags */
@@ -180,6 +181,7 @@ typedef struct {
 	struct SECURITY_CONTEXT security;
 	struct open_file *open_files; /* only defined in lowntfs-3g */
 	u64 latest_ghost;
+	s64 dev_offset;
 } ntfs_fuse_context_t;
 
 extern const char *EXEC_NAME;
