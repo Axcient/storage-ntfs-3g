@@ -543,6 +543,15 @@ AC_CHECK_FUNCS([ \
 ])
 AC_SYS_LARGEFILE
 
+AC_CHECK_FUNCS([extattr_set_file],
+	[
+		AC_DEFINE([HAVE_SETXATTR], [1],
+		[Define this to 1 if you want to enable
+		extended attributes support.])
+	],
+	[],
+)
+
 # The dlopen API might be in libc or in libdl.  Check libc first, then
 # fall back to libdl.
 LIBDL=""
