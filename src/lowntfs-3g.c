@@ -4229,6 +4229,85 @@ static void ntfs_fuse_destroy2(void *notused __attribute__((unused)))
 	ntfs_close();
 }
 
+static void ntfs_fuse_lseek(fuse_req_t req, fuse_ino_t ino, off_t off, int whence, struct fuse_file_info *fi __attribute__((unused)))
+{
+	ntfs_inode *ni;
+	ntfs_attr *na;
+	VCN vcn;
+	int i;
+	off_t ret = 0;
+
+	if (whence != SEEK_DATA && whence != SEEK_HOLE) {
+		ret = -ENOSYS;
+		goto done;
+	}
+
+	ni = ntfs_inode_open(ctx->vol, INODE(ino));
+	if (!ni) {
+		ret = -errno;
+		goto done;
+	}
+
+	na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
+	if (!na) {
+		ret = -errno;
+		goto close_inode;
+	}
+
+	if ((na->data_flags & (ATTR_COMPRESSION_MASK | ATTR_IS_ENCRYPTED))
+			 || !NAttrNonResident(na)) {
+		ret = -EINVAL;
+		goto close_attr;
+	}
+
+	if (na->data_size <= off) {
+		ret = -ENXIO;
+		goto close_attr;
+	}
+
+	if (ntfs_attr_map_whole_runlist(na)) {
+		ret = -errno;
+		goto close_attr;
+	}
+
+	if (!na->rl) {
+		ret = (whence == SEEK_DATA) ? -ENXIO : na->data_size;
+		goto close_attr;
+	}
+
+	vcn = off / ctx->vol->cluster_size;
+	if (vcn < na->rl[0].vcn && whence == SEEK_HOLE) {
+		ret = off;
+		goto close_attr;
+	}
+
+	for (i = 0; na->rl[i].length; i++) {
+		if (vcn < na->rl[i].vcn + na->rl[i].length &&
+			((0 <= na->rl[i].lcn && whence == SEEK_DATA) ||
+			 (na->rl[i].lcn < 0 && whence == SEEK_HOLE))) {
+			break;
+		}
+	}
+
+	if (!na->rl[i].length) {
+		ret = (whence == SEEK_DATA) ? -ENXIO : na->data_size;
+		goto close_attr;
+	}
+
+	ret = na->rl[i].vcn * ctx->vol->cluster_size;
+	ret = (off <= ret) ? ret : off;
+close_attr:
+	ntfs_attr_close(na);
+close_inode:
+	if (ntfs_inode_close(ni))
+		ret = -errno;
+done:
+	if (ret < 0)
+		fuse_reply_err(req, -ret);
+	else
+		fuse_reply_lseek(req, ret);
+}
+
 static struct fuse_lowlevel_ops ntfs_3g_ops = {
 	.lookup 	= ntfs_fuse_lookup,
 	.getattr	= ntfs_fuse_getattr,
@@ -4273,6 +4352,7 @@ static struct fuse_lowlevel_ops ntfs_3g_ops = {
 	.setbkuptime	= ntfs_macfuse_setbkuptime,
 	.setchgtime	= ntfs_macfuse_setchgtime,
 #endif /* defined(__APPLE__) || defined(__DARWIN__) */
+	.lseek		= ntfs_fuse_lseek,
 	.init		= ntfs_init
 };
 
