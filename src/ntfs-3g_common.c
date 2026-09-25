@@ -263,6 +263,9 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 	s = options;
 	while (s && *s && (val = strsep(&s, ","))) {
 		opt = strsep(&val, "=");
+		while (opt && *opt == ' ')
+			++opt;
+		opt = strsep(&opt, " ");
 		poptl = optionlist;
 		while (poptl->name && strcmp(poptl->name,opt))
 			poptl++;
