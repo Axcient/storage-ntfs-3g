@@ -1476,6 +1476,9 @@ static int ntfs_fuse_open(const char *org_path,
 	struct SECURITY_CONTEXT security;
 #endif
 
+	if (ctx->direct_io && fi)
+		fi->direct_io = TRUE;
+
 	stream_name_len = ntfs_fuse_parse_path(org_path, &path, &stream_name);
 	if (stream_name_len < 0)
 		return stream_name_len;
@@ -2061,6 +2064,9 @@ static int ntfs_fuse_create(const char *org_path, mode_t typemode, dev_t dev,
 	struct SECURITY_CONTEXT security;
 	int res = 0, uname_len, utarget_len;
 
+	if (ctx->direct_io && fi)
+		fi->direct_io = TRUE;
+
 	dir_path = strdup(org_path);
 	if (!dir_path)
 		return -errno;
@@ -2243,6 +2249,9 @@ static int ntfs_fuse_create_stream(const char *path,
 	ntfs_inode *ni;
 	int res = 0;
 
+	if (ctx->direct_io && fi)
+		fi->direct_io = TRUE;
+
 	ni = ntfs_pathname_to_inode(ctx->vol, NULL, path);
 	if (!ni) {
 		res = -errno;
@@ -2295,6 +2304,9 @@ static int ntfs_fuse_mknod_common(const char *org_path, mode_t mode, dev_t dev,
 	ntfschar *stream_name;
 	int stream_name_len;
 	int res = 0;
+
+	if (ctx->direct_io && fi)
+		fi->direct_io = TRUE;
 
 	stream_name_len = ntfs_fuse_parse_path(org_path, &path, &stream_name);
 	if (stream_name_len < 0)
