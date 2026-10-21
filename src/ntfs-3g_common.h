@@ -96,6 +96,7 @@ enum {
 	OPT_SPECIAL_FILES,
 	OPT_HELP,
 	OPT_VERSION,
+	OPT_DIRECT_IO,
 } ;
 
 			/* Option flags */
@@ -158,6 +159,7 @@ typedef struct {
 	BOOL blkdev;
 	BOOL mounted;
 	BOOL posix_nlink;
+	BOOL direct_io;
 	ntfs_volume_special_files special_files;
 #ifdef HAVE_SETXATTR	/* extended attributes interface required */
 	BOOL efs_raw;

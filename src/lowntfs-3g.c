@@ -1600,6 +1600,9 @@ static void ntfs_fuse_open(fuse_req_t req, fuse_ino_t ino,
 	struct SECURITY_CONTEXT security;
 #endif
 
+	if (ctx->direct_io && fi)
+		fi->direct_io = TRUE;
+
 	ni = ntfs_inode_open(ctx->vol, INODE(ino));
 	if (ni) {
 		if (!(ni->flags & FILE_ATTR_REPARSE_POINT)) {
@@ -2341,6 +2344,9 @@ static int ntfs_fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 	mode_t perm;
 	struct SECURITY_CONTEXT security;
 	int res = 0, uname_len, utarget_len;
+
+	if (ctx->direct_io && fi)
+		fi->direct_io = TRUE;
 
 	/* Generate unicode filename. */
 	uname_len = ntfs_mbstoucs(name, &uname);
