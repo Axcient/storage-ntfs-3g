@@ -172,6 +172,9 @@ This is mainly useful for big files which are kept open for a long
 time and written to without changing their size, such as databases or file
 system images mounted as loop.
 .TP
+.B direct_io
+This option disables the use of page cache in kernel.
+.TP
 .BI dmask= value
 Set the  bitmask of the directory permissions that are not
 present. The value is given in octal. The default value is 0 which
