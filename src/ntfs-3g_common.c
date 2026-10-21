@@ -128,6 +128,7 @@ const struct DEFOPTION optionlist[] = {
 	{ "efs_raw", OPT_EFS_RAW, FLGOPT_BOGUS },
 	{ "posix_nlink", OPT_POSIX_NLINK, FLGOPT_BOGUS },
 	{ "special_files", OPT_SPECIAL_FILES, FLGOPT_STRING },
+	{ "direct_io", OPT_DIRECT_IO, FLGOPT_BOGUS },
 	{ "--help", OPT_HELP, FLGOPT_BOGUS },
 	{ "-h", OPT_HELP, FLGOPT_BOGUS },
 	{ "--version", OPT_VERSION, FLGOPT_BOGUS },
@@ -254,6 +255,7 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 	ctx->efs_raw = FALSE;
 #endif /* HAVE_SETXATTR */
 	ctx->compression = DEFAULT_COMPRESSION;
+	ctx->direct_io = FALSE;
 	options = strdup(orig_opts ? orig_opts : "");
 	if (!options) {
 		ntfs_log_perror("%s: strdup failed", EXEC_NAME);
@@ -507,6 +509,9 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 #endif /* HAVE_SETXATTR */
 			case OPT_POSIX_NLINK :
 				ctx->posix_nlink = TRUE;
+				break;
+			case OPT_DIRECT_IO:
+				ctx->direct_io = TRUE;
 				break;
 			case OPT_SPECIAL_FILES :
 				if (!strcmp(val, "interix"))
