@@ -39,6 +39,11 @@
 #include "compat.h" /* may be needed for ENODATA definition */
 #define XATTR_CREATE	1
 #define XATTR_REPLACE	2
+
+#if defined(HAVE_EXTATTR_SET_FILE) /* FreeBSD */
+#define HAVE_SETXATTR
+#endif
+
 #endif
 
 /*
