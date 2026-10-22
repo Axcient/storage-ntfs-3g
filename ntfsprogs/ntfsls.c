@@ -118,6 +118,7 @@ static struct options {
 	int classify;
 	int recursive;
 	const char *path;
+	s64 dev_offset;
 } opts;
 
 typedef struct {
@@ -172,6 +173,7 @@ static void usage(void)
 		"    -V, --version        Display version information\n"
 		"    -v, --verbose        More output\n"
 		"    -x, --dos            Use short (DOS 8.3) names\n"
+		"    -o, --dev_offset     Use offset for volume\n"
 		"\n",
 		EXEC_NAME);
 
@@ -191,7 +193,7 @@ static void usage(void)
  */
 static int parse_options(int argc, char *argv[])
 {
-	static const char *sopt = "-aFfh?ilp:qRsVvx";
+	static const char *sopt = "-aFfh?ilp:o:qRsVvx";
 	static const struct option lopt[] = {
 		{ "all",	 no_argument,		NULL, 'a' },
 		{ "classify",	 no_argument,		NULL, 'F' },
@@ -206,6 +208,7 @@ static int parse_options(int argc, char *argv[])
 		{ "version",	 no_argument,		NULL, 'V' },
 		{ "verbose",	 no_argument,		NULL, 'v' },
 		{ "dos",	 no_argument,		NULL, 'x' },
+		{ "dev_offset",	 required_argument,	NULL, 'o' },
 		{ NULL, 0, NULL, 0 },
 	};
 
@@ -231,6 +234,9 @@ static int parse_options(int argc, char *argv[])
 			break;
 		case 'p':
 			opts.path = optarg;
+			break;
+		case 'o':
+			opts.dev_offset = optarg ? atoll(optarg) : 0;
 			break;
 		case 'f':
 			opts.force++;
@@ -650,8 +656,8 @@ int main(int argc, char **argv)
 
 	utils_set_locale();
 
-	vol = utils_mount_volume(opts.device, NTFS_MNT_RDONLY |
-			(opts.force ? NTFS_MNT_RECOVER : 0));
+	vol = utils_mount_volume_ext(opts.device, NTFS_MNT_RDONLY |
+			(opts.force ? NTFS_MNT_RECOVER : 0), opts.dev_offset);
 	if (!vol) {
 		// FIXME: Print error... (AIA)
 		return 2;
