@@ -2,7 +2,7 @@
 .\" Copyright (c) 2005 Richard Russon.
 .\" This file may be copied under the terms of the GNU Public License.
 .\"
-.TH NTFSLS 8 "November 2005" "ntfs-3g @VERSION@"
+.TH NTFSLS 8 "October 2026" "ntfs-3g @VERSION@"
 .SH NAME
 ntfsls \- list directory contents on an NTFS filesystem
 .SH SYNOPSIS
@@ -39,6 +39,12 @@ ntfsls \- list directory contents on an NTFS filesystem
 .B \-l
 |
 .B \-\-long
+]
+[
+.B \-o
+|
+.B \-\-dev_offset
+.I offset
 ]
 [
 .B \-p
@@ -118,6 +124,9 @@ terminology.
 .TP
 \fB\-l\fR, \fB\-\-long\fR
 Use a long listing format.
+.TP
+\fB\-o\fR, \fB\-\-dev_offset\fR offset
+Skip the first \fBoffset\fP bytes from the start of \fIdevice\fR.
 .TP
 \fB\-p\fR, \fB\-\-path\fR PATH
 The directory whose contents to list or the file (including the path) about
