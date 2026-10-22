@@ -164,8 +164,8 @@ on existing files. Currently this is the default option.
 Makes ntfs-3g (or lowntfs-3g) to print a lot of debug output from libntfs-3g
 and FUSE.
 .TP
-.B dev_offset
-Makes ntfs-3g (or lowntfs-3g) to read volume by ofsset from start..
+.B dev_offset= offset
+Skip the first \foffset\fP bytes from the start of \fIvolume\fR .
 .TP
 .B delay_mtime[= value]
 Only update the file modification time and the file change time of a file
