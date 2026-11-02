@@ -254,7 +254,13 @@ int utils_valid_device(const char *name, int force)
 /**
  * utils_mount_volume - Mount an NTFS volume
  */
+
 ntfs_volume * utils_mount_volume(const char *device, unsigned long flags)
+{
+    return utils_mount_volume_ext(device, flags, 0);
+}
+
+ntfs_volume * utils_mount_volume_ext(const char *device, unsigned long flags, const s64 dev_offset)
 {
 	ntfs_volume *vol;
 
@@ -281,7 +287,7 @@ ntfs_volume * utils_mount_volume(const char *device, unsigned long flags)
 	if (!utils_valid_device(device, flags & NTFS_MNT_RECOVER))
 		return NULL;
 
-	vol = ntfs_mount(device, flags);
+	vol = ntfs_mount_ext(device, flags, dev_offset);
 	if (!vol) {
 		ntfs_log_perror("Failed to mount '%s'", device);
 		if (errno == EINVAL)
